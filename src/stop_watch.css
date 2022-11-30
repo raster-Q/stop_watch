@@ -1,0 +1,25 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+#panel {
+  text-align: center;
+  margin: auto;
+  width: 10em;
+}
+
+#display {
+  text-align: center;
+  background-color: black;
+  color: aqua;
+  margin-bottom: 0.2em;
+  padding: 0.5em;
+}
+
+#log_list {
+  text-align: center;
+  color: blue;
+  font-size: 12px;
+  line-height: 5px;
+}

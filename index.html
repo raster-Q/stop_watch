@@ -1,16 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="jp">
+  <head>
+    <title>stopwatch ver.01</title>
 
-<head>
-	<title>Parcel Sandbox</title>
-	<meta charset="UTF-8" />
-</head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+    <link href="src/stop_watch.css" rel="stylesheet" />
+  </head>
 
-<body>
-	<div id="app"></div>
+  <body>
+    <div id="app"></div>
+    <h1>ストップウォッチver.01</h1>
+    <div id="panel">
+      <p id="display">0</p>
+    </div>
+    <p>
+      <button id="start" value="0">スタート</button>
+      <button id="stop" value="1">ストップ</button>
+    </p>
+    <p>
+      音量：
+      <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5" />
+      <span id="vol_range">0.5</span>
+    </p>
+    <div id="log_list">
+      <p></p>
+    </div>
 
-	<script src="src/index.js">
-	</script>
-</body>
+    <audio id="timer_mp3" preload="auto">
+      <!--ウォッチ他-->
+      <source src="timer_01.mp3" type="audio/mp3" />
+    </audio>
 
+    <audio id="count_down_00_mp3" preload="auto">
+      <!--カウントダウン-->
+      <source src="count_down_00.mp3" type="audio/mp3" />
+    </audio>
+
+    <audio id="count_go_mp3" preload="auto">
+      <!--カウントゴー-->
+      <source src="count_go_01.mp3" type="audio/mp3" />
+    </audio>
+
+    <script src="src/stop_watch.js"></script>
+  </body>
 </html>
