@@ -2,7 +2,7 @@ function stopwatch(options) {
   //関数発動
 
   //---変数
-  let sss = {
+  const sss = {
     time: 0, //全体タイム
     sto: 1, //0ウォッチ運航、1ウォッチ停止
     hour10: 0, //時間10の位
@@ -26,7 +26,7 @@ function stopwatch(options) {
   let elem_volume = document.getElementById("volume");
   let elem_range = document.getElementById("vol_range");
 
-  let lll = {
+  const lll = {
     //ログ用
     log_start: [], //
     log_stop: [], //
@@ -57,7 +57,7 @@ function stopwatch(options) {
       sss.min01 = Math.floor(sss.time / 100) % 10;
       sss.min10 = Math.floor(sss.time / 1000) % 10;
       sss.hour01 = Math.floor(sss.time / 10000) % 10;
-      sss.hour10 = Math.floor(sss.time / 100000) * 10;
+      sss.hour10 = Math.floor(sss.time / 100000) % 10;
       display.textContent = `${sss.hour10}${sss.hour01}時${sss.min10}${sss.min01}分${sss.sec10}${sss.sec01}秒`;
       audio2();
     } else if (sss.sto === 1) {
@@ -85,7 +85,6 @@ function stopwatch(options) {
   }
 
   function audio2() {
-    //
     if (sss.sec10 === 5 && sss.sec01 >= 7) {
       audy2[0].play();
       audy2.currentTime = 0;
@@ -208,7 +207,7 @@ function stopwatch(options) {
   display.style.backgroundColor = backgroundColor;
 } //関数終了
 
-let options = {
+const options = {
   color: "limegreen",
   backgroundColor: "#333333"
 };
