@@ -140,13 +140,12 @@ function stopwatch(options) {
     //////1桁→0入り2桁関数、ここまで//////
 
     //////ログ打ち出し用関数//////////////
-    results = [
-      `${lol.num} 開始 ${get_time(new Date())}`,
-      `　終了 ${get_time(new Date())}`,
-      `　経過 ${waw.hour10}${waw.hour01}:${waw.min10}${waw.min01}.${waw.sec10}${waw.sec01}`
-    ];
-
     function result(sto) {
+      results = [
+        `${lol.num} 開始 ${get_time(new Date())}`,
+        `　終了 ${get_time(new Date())}`,
+        `　経過 ${waw.hour10}${waw.hour01}:${waw.min10}${waw.min01}.${waw.sec10}${waw.sec01}`
+      ];
       lol.create_p = document.createElement("p");
       lol.create_p.classList.add("log");
       lol.create_p.innerText = results[sto];
