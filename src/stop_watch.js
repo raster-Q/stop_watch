@@ -5,9 +5,9 @@ function stopwatch(options) {
   //---ウォッチ関連
   let watcherId = null;
   const waw = {
-    /*   wa(tch) + w   */
+    /*  wa(tch) + w  */
     time: 0, //全体タイム
-    sto: 1, //0ウォッチ運航、1ウォッチ停止
+    sto: 1, //0ウォッチ稼働、1ウォッチ停止
     hour10: 0, //時間10の位
     hour01: 0, //時間1の位
     min10: 0, //分10の位
@@ -25,16 +25,16 @@ function stopwatch(options) {
   ];
 
   //---ボタンid取得用
-  let start = document.getElementById("start");
-  let stop = document.getElementById("stop");
+  const start = document.getElementById("start");
+  const stop = document.getElementById("stop");
 
   //---ボリューム用
-  let elem_volume = document.getElementById("volume");
-  let elem_range = document.getElementById("vol_range");
+  const elem_volume = document.getElementById("volume");
+  const elem_range = document.getElementById("vol_range");
 
   //---ログ用
   const lol = {
-    /*   lo(g) + l   */
+    /*  lo(g) + l  */
     num: 0, //セット数
     timeElem: [
       new Date().getHours(),
@@ -45,35 +45,41 @@ function stopwatch(options) {
     create_p: null,
     create_div: document.getElementById("log_list")
   };
-
   /////変数ここまで
 
   /////関数
-  //---タイマー用
+  //---ウォッチ用
   function disp_watchw() {
-    if (waw.sto === 0) {
-      waw.time++;
-      if (Math.floor(waw.time / 10) % 10 > 5) {
-        waw.time += 40; //60進法、秒
-      }
+    switch (
+      waw.sto //ウォッチ稼働フラグ
+    ) {
+      case 0: //ウォッチ稼働
+        waw.time++;
+        if (Math.floor(waw.time / 10) % 10 > 5) {
+          waw.time += 40; //60進法、秒
+        }
 
-      if (Math.floor(waw.time / 1000) % 10 > 5) {
-        waw.time += 4000; //60進法、分
-      }
+        if (Math.floor(waw.time / 1000) % 10 > 5) {
+          waw.time += 4000; //60進法、分
+        }
 
-      waw.sec01 = waw.time % 10;
-      waw.sec10 = Math.floor(waw.time / 10) % 10;
-      waw.min01 = Math.floor(waw.time / 100) % 10;
-      waw.min10 = Math.floor(waw.time / 1000) % 10;
-      waw.hour01 = Math.floor(waw.time / 10000) % 10;
-      waw.hour10 = Math.floor(waw.time / 100000) % 10;
-      display.textContent = `${waw.hour10}${waw.hour01}時${waw.min10}${waw.min01}分${waw.sec10}${waw.sec01}秒`;
-      audio2();
-    } else if (waw.sto === 1) {
-      display.textContent = `${waw.hour10}${waw.hour01}時${waw.min10}${waw.min01}分${waw.sec10}${waw.sec01}秒`;
+        waw.sec01 = waw.time % 10;
+        waw.sec10 = Math.floor(waw.time / 10) % 10;
+        waw.min01 = Math.floor(waw.time / 100) % 10;
+        waw.min10 = Math.floor(waw.time / 1000) % 10;
+        waw.hour01 = Math.floor(waw.time / 10000) % 10;
+        waw.hour10 = Math.floor(waw.time / 100000) % 10;
+        display.textContent = `${waw.hour10}${waw.hour01}時${waw.min10}${waw.min01}分${waw.sec10}${waw.sec01}秒`;
+        audio2();
+        break;
+      case 1: //ウォッチ停止
+        display.textContent = `${waw.hour10}${waw.hour01}時${waw.min10}${waw.min01}分${waw.sec10}${waw.sec01}秒`;
+        break;
+      default:
+        break;
     }
   }
-  //---タイマー用ここまで
+  //--/ウォ用ここまで
 
   //---オーディオ用
   function audio() {
@@ -83,10 +89,17 @@ function stopwatch(options) {
       "ended",
       () => {
         audy.currentTime = 0;
-        if (waw.sto === 0) {
-          audy.play();
-        } else {
-          audy.pause();
+        switch (
+          waw.sto //ウォッチ稼働フラグ
+        ) {
+          case 0: //ウォッチ稼働
+            audy.play();
+            break;
+          case 1: //ウォッチ停止
+            audy.pause();
+            break;
+          default:
+            break;
         }
       },
       false
@@ -119,30 +132,41 @@ function stopwatch(options) {
       lol.timeElem[1] = now.getMinutes();
       lol.timeElem[2] = now.getSeconds();
       lol.timeElem2 = lol.timeElem
-        .map((e) => (e < 10 ? "0" + e : e))
-        .map((e) => String(e));
+        .map((e) => String(e))
+        .map((e) => (e.length < 2 ? "0" + e : e));
       return `${lol.timeElem2[0]}:${lol.timeElem2[1]}.${lol.timeElem2[2]}`;
     }
     //////1桁→0入り2桁関数、ここまで//////
 
-    lol.create_p = document.createElement("p");
-    lol.create_p.classList.add("log");
+    //////ログ打ち出し用関数//////////////
+    var results = [
+      `${lol.num} 開始 ${get_time(new Date())}`,
+      `　終了 ${get_time(new Date())}`,
+      `　経過 ${waw.hour10}${waw.hour01}:${waw.min10}${waw.min01}.${waw.sec10}${waw.sec01}`
+    ];
 
-    if (waw.sto === 0) {
-      lol.num++;
-      lol.create_p.innerText = `${lol.num} 開始 ${get_time(new Date())}`;
-      lol.create_div.append(lol.create_p);
-      console.log(lol.create_p);
-    } else {
-      lol.create_p.innerText = `　終了 ${get_time(new Date())}`;
-      lol.create_div.append(lol.create_p);
-      console.log(lol.create_p);
-
+    function result(sto) {
       lol.create_p = document.createElement("p");
       lol.create_p.classList.add("log");
-      lol.create_p.innerText = `　経過 ${waw.hour10}${waw.hour01}:${waw.min10}${waw.min01}.${waw.sec10}${waw.sec01}`;
+      lol.create_p.innerText = results[sto];
       lol.create_div.append(lol.create_p);
       console.log(lol.create_p);
+    }
+    //////ログ打ち出し用関数、ここまで///////
+
+    switch (
+      waw.sto //ウォッチ稼働フラグ
+    ) {
+      case 0: //ウォッチ稼働
+        lol.num++;
+        result(waw.sto);
+        break;
+      case 1: //ウォッチ停止
+        result(waw.sto);
+        result(waw.sto + 1);
+        break;
+      default:
+        break;
     }
   }
   //------ログ用ここまで
@@ -171,11 +195,11 @@ function stopwatch(options) {
       waw.sec10 = 0;
       waw.sec01 = 0;
       display.textContent = `${waw.hour10}${waw.hour01}時${waw.min10}${waw.min01}分${waw.sec10}${waw.sec01}秒`;
-      console.log(lol.timeElem);
 
       if (watcherId == null) {
         watcherId = setInterval(disp_watchw, 1000);
       }
+
       audio();
       disp_log();
     },
@@ -191,13 +215,12 @@ function stopwatch(options) {
       waw.sto = 1; //ストップウォッチ停止状態
       clearInterval(watcherId);
       watcherId = null;
-      console.log(lol.timeElem);
       disp_log();
     },
     false
   );
 
-  //------イベント、ボリューム
+  //------イベント処理、ボリューム
   elem_volume.addEventListener(
     "change",
     function () {
