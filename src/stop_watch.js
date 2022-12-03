@@ -35,7 +35,7 @@ function stopwatch(options) {
   //---ログ用
   const lol = {
     /*  lo(g) + l  */
-    num: 0, //セット数
+    num: 1, //セット数
     timeElem: [
       new Date().getHours(),
       new Date().getMinutes(),
@@ -45,6 +45,7 @@ function stopwatch(options) {
     create_p: null,
     create_div: document.getElementById("log_list")
   };
+  let results = new Array(3);
   /////変数ここまで
 
   /////関数
@@ -139,7 +140,7 @@ function stopwatch(options) {
     //////1桁→0入り2桁関数、ここまで//////
 
     //////ログ打ち出し用関数//////////////
-    var results = [
+    results = [
       `${lol.num} 開始 ${get_time(new Date())}`,
       `　終了 ${get_time(new Date())}`,
       `　経過 ${waw.hour10}${waw.hour01}:${waw.min10}${waw.min01}.${waw.sec10}${waw.sec01}`
@@ -158,8 +159,8 @@ function stopwatch(options) {
       waw.sto //ウォッチ稼働フラグ
     ) {
       case 0: //ウォッチ稼働
-        lol.num++;
         result(waw.sto);
+        lol.num++;
         break;
       case 1: //ウォッチ停止
         result(waw.sto);
