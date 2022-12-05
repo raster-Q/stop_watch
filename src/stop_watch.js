@@ -125,6 +125,13 @@ function stopwatch(options) {
   }
   //---オーディオ用ここまで
 
+  //////////////初期html操作/////////////////////////
+  start.disabled = false;
+  stop.disabled = true;
+  display.textContent = `${waw.hour10}${waw.hour01}時${waw.min10}${waw.min01}分${waw.sec10}${waw.sec01}秒`;
+  audy.volume = elem_volume.value;
+  //////////////初期html操作ここまで/////////////////////////
+
   //---ログ用
   function disp_log() {
     //////1桁→0入り2桁関数/////////////
@@ -172,13 +179,6 @@ function stopwatch(options) {
   //------ログ用ここまで
 
   /////関数ここまで
-
-  //////////////初期html操作/////////////////////////
-  start.disabled = false;
-  stop.disabled = true;
-  display.textContent = `${waw.hour10}${waw.hour01}時${waw.min10}${waw.min01}分${waw.sec10}${waw.sec01}秒`;
-  audy.volume = elem_volume.value;
-  //////////////初期html操作ここまで/////////////////////////
 
   //-----イベント処理、スタートボタン
   start.addEventListener(
