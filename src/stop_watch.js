@@ -1,21 +1,28 @@
 function stopwatch(options) {
-  //関数発動
+  //全体関数発動
 
   /////変数
   //---ウォッチ関連
   let watcherId = null;
   const waw = {
     /*  wa(tch) + w  */
-    time: 0, //全体タイム
+    time: 10000000, //全体タイム
     sto: 1, //0ウォッチ稼働、1ウォッチ停止
-    hour10: 0, //時間10の位
-    hour01: 0, //時間1の位
-    min10: 0, //分10の位
-    min01: 0, //分1の位
-    sec10: 0, //秒10の位
-    sec01: 0 //秒1の位
+    timeElem: [], //[時間,分,秒]
+    timeElem2: "",
+    reload: () => {
+      waw.timeElem[0] = Math.floor(waw.time / 10000) % 100;
+      waw.timeElem[1] = Math.floor(waw.time / 100) % 100;
+      waw.timeElem[2] = waw.time % 100;
+      return waw.timeElem;
+    },
+    display: document.getElementById("display"),
+    displayLoad: () => {
+      waw.display = document.getElementById("display");
+      waw.timeElem2 = get_time(waw.reload());
+      waw.display.textContent = `${waw.timeElem2}`;
+    }
   };
-  const display = document.getElementById("display");
 
   //---効果音関連
   const audy = document.getElementById("timer_mp3");
@@ -33,19 +40,7 @@ function stopwatch(options) {
   const elem_range = document.getElementById("vol_range");
 
   //---ログ用
-  const lol = {
-    /*  lo(g) + l  */
-    num: 1, //セット数
-    timeElem: [
-      new Date().getHours(),
-      new Date().getMinutes(),
-      new Date().getSeconds()
-    ],
-    timeElem2: [],
-    create_p: null,
-    create_div: document.getElementById("log_list")
-  };
-  let results = new Array(3);
+  let num = 0;
   /////変数ここまで
 
   /////関数
@@ -56,25 +51,18 @@ function stopwatch(options) {
     ) {
       case 0: //ウォッチ稼働
         waw.time++;
-        if (Math.floor(waw.time / 10) % 10 > 5) {
+        if (waw.time % 100 > 59) {
           waw.time += 40; //60進法、秒
         }
 
-        if (Math.floor(waw.time / 1000) % 10 > 5) {
+        if (Math.floor(waw.time / 100) % 100 > 59) {
           waw.time += 4000; //60進法、分
         }
-
-        waw.sec01 = waw.time % 10;
-        waw.sec10 = Math.floor(waw.time / 10) % 10;
-        waw.min01 = Math.floor(waw.time / 100) % 10;
-        waw.min10 = Math.floor(waw.time / 1000) % 10;
-        waw.hour01 = Math.floor(waw.time / 10000) % 10;
-        waw.hour10 = Math.floor(waw.time / 100000) % 10;
-        display.textContent = `${waw.hour10}${waw.hour01}時${waw.min10}${waw.min01}分${waw.sec10}${waw.sec01}秒`;
+        waw.displayLoad();
         audio2();
         break;
       case 1: //ウォッチ停止
-        display.textContent = `${waw.hour10}${waw.hour01}時${waw.min10}${waw.min01}分${waw.sec10}${waw.sec01}秒`;
+        //display.textContent = `${get_time(waw.timeElem)}`;
         break;
       default:
         break;
@@ -84,15 +72,12 @@ function stopwatch(options) {
 
   //---オーディオ用
   function audio() {
-    //
     audy.play();
     audy.addEventListener(
       "ended",
       () => {
         audy.currentTime = 0;
-        switch (
-          waw.sto //ウォッチ稼働フラグ
-        ) {
+        switch (waw.sto) {
           case 0: //ウォッチ稼働
             audy.play();
             break;
@@ -108,100 +93,140 @@ function stopwatch(options) {
   }
 
   function audio2() {
-    if (waw.sec10 === 5 && waw.sec01 >= 7) {
+    if (waw.time % 100 >= 50 && waw.time % 10 >= 7) {
       audy2[0].play();
-      audy2.currentTime = 0;
-      console.log(waw.sec01);
       setTimeout(() => {
         audy2[0].pause();
         audy2[0].currentTime = 0;
       }, 900);
     }
 
-    if (waw.sec10 === 0 && waw.sec01 === 0) {
+    if (waw.time % 100 === 0 && waw.time % 10 === 0) {
       audy2[1].play();
-      audy2.currentTime = 0;
     }
   }
   //---オーディオ用ここまで
 
-  //---ログ用
-  function disp_log() {
-    //////1桁→0入り2桁関数/////////////
-    function get_time(now) {
-      lol.timeElem[0] = now.getHours();
-      lol.timeElem[1] = now.getMinutes();
-      lol.timeElem[2] = now.getSeconds();
-      lol.timeElem2 = lol.timeElem
-        .map((e) => String(e))
-        .map((e) => (e.length < 2 ? "0" + e : e));
-      return `${lol.timeElem2[0]}:${lol.timeElem2[1]}.${lol.timeElem2[2]}`;
-    }
-    //////1桁→0入り2桁関数、ここまで//////
-
-    //////ログ打ち出し用関数//////////////
-    function result(sto) {
-      results = [
-        `${lol.num} 開始 ${get_time(new Date())}`,
-        `　終了 ${get_time(new Date())}`,
-        `　経過 ${waw.hour10}${waw.hour01}:${waw.min10}${waw.min01}.${waw.sec10}${waw.sec01}`
-      ];
-      lol.create_p = document.createElement("p");
-      lol.create_p.classList.add("log");
-      lol.create_p.innerText = results[sto];
-      lol.create_div.append(lol.create_p);
-      console.log(lol.create_p);
-    }
-    //////ログ打ち出し用関数、ここまで///////
-
-    switch (
-      waw.sto //ウォッチ稼働フラグ
-    ) {
-      case 0: //ウォッチ稼働
-        result(waw.sto);
-        lol.num++;
-        break;
-      case 1: //ウォッチ停止
-        result(waw.sto);
-        result(waw.sto + 1);
-        break;
-      default:
-        break;
-    }
+  //---1桁→0入り2桁
+  function get_time(timeArr) {
+    timeArr = timeArr
+      .map((e) => String(e))
+      .map((e) => (e.length < 2 ? "0" + e : e));
+    return timeArr.join(":");
   }
-  //------ログ用ここまで
-
-  /////関数ここまで
+  //---1桁→0入り2桁関数、ここまで
+  /////関数、ここまで
 
   //////////////初期html操作/////////////////////////
   start.disabled = false;
   stop.disabled = true;
-  display.textContent = `${waw.hour10}${waw.hour01}時${waw.min10}${waw.min01}分${waw.sec10}${waw.sec01}秒`;
+  waw.displayLoad();
   audy.volume = elem_volume.value;
   //////////////初期html操作ここまで/////////////////////////
+
+  //////////////クラス導入/////////////////////////////////////
+
+  class lol {
+    //////コンストラクタ//////////////
+    constructor(num, now, timeElem) {
+      this.num = num;
+      this.now = now;
+      this.timeElem = timeElem;
+    }
+    //////コンストラクタ、ここまで///////
+
+    //////ログ選択用その1//////////////
+    messageLog(sto, clas, num) {
+      switch (sto) {
+        case 0:
+          this.create_p = document.createElement("p");
+          this.create_p.classList = clas;
+          this.create_p.innerText = this.results[num];
+          this.anchor_div.append(this.create_p);
+          console.log(this.create_p);
+          break;
+        case 1:
+          this.create_p = document.querySelector(clas);
+          this.create_p.textContent = `${this.results[num]}`;
+          console.log(this.create_p);
+          break;
+        default:
+          break;
+      }
+    }
+    //////ログ選択用その1、ここまで///////////////
+
+    //////ログ選択用その2///////////////////////
+    result(sto) {
+      this.timeElem[0] = this.now.getHours();
+      this.timeElem[1] = this.now.getMinutes();
+      this.timeElem[2] = this.now.getSeconds();
+      this.timeElem2 = get_time(this.timeElem);
+      this.results = [
+        `${this.num} 開始  ${this.timeElem2}`,
+        `　終了 ${this.timeElem2}`,
+        `　経過 ${waw.timeElem2}`,
+        `-----------------`
+      ];
+      switch (waw.sto) {
+        case 0:
+          this.anchor_div = document.createElement("div");
+          this.anchor_div.classList = "anchor";
+          this.log_list_section = document.querySelector("#log_list");
+          this.log_list_section.prepend(this.anchor_div);
+
+          this.messageLog(waw.sto, `start`, 0);
+          this.messageLog(waw.sto, `stop`, 3);
+          this.messageLog(waw.sto, `process`, 3);
+          break;
+        case 1:
+          this.messageLog(waw.sto, `.stop`, 1);
+          this.messageLog(waw.sto, `.process`, 2);
+          break;
+        default:
+          break;
+      }
+    }
+    //////ログ選択用その2、ここまで///////
+
+    //////ログ打ち出し用関数/////////////
+    disp_log() {
+      switch (waw.sto) {
+        case 0: //ウォッチ稼働
+          this.result(0);
+          break;
+        case 1: //ウォッチ停止
+          this.result(1);
+          this.result(2);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  //////ログ打ち出し用関数、ここまで
+
+  /////////////////クラス導入、ここまで///////////////
 
   //-----イベント処理、スタートボタン
   start.addEventListener(
     "click",
-    () => {
+    function () {
       start.disabled = true;
       stop.disabled = false;
-      waw.time = 0;
+      waw.time = 10000000;
       waw.sto = 0;
-      waw.hour10 = 0;
-      waw.hour01 = 0;
-      waw.min10 = 0;
-      waw.min01 = 0;
-      waw.sec10 = 0;
-      waw.sec01 = 0;
-      display.textContent = `${waw.hour10}${waw.hour01}時${waw.min10}${waw.min01}分${waw.sec10}${waw.sec01}秒`;
-
+      waw.displayLoad();
+      num++;
       if (watcherId == null) {
         watcherId = setInterval(disp_watchw, 1000);
       }
 
       audio();
-      disp_log();
+      ///ログ打ち出し、class導入///
+      let logger = new lol(num, new Date(), []);
+      logger.disp_log();
+      ///ログ打ち出し、class導入、ここまで///
     },
     false
   );
@@ -209,13 +234,16 @@ function stopwatch(options) {
   //-----イベント処理、ストップボタン
   stop.addEventListener(
     "click",
-    () => {
+    function () {
       stop.disabled = true;
       start.disabled = false;
       waw.sto = 1; //ストップウォッチ停止状態
       clearInterval(watcherId);
       watcherId = null;
-      disp_log();
+      ///ログ打ち出し、class導入///
+      let logger = new lol(num, new Date(), []);
+      logger.disp_log();
+      ///ログ打ち出し、class導入、ここまで///
     },
     false
   );
@@ -234,9 +262,9 @@ function stopwatch(options) {
   options = options || {};
   let color = options.color || "lightblue";
   let backgroundColor = options.backgroundColor || "black";
-  display.style.color = color;
-  display.style.backgroundColor = backgroundColor;
-} //関数終了
+  waw.display.style.color = color;
+  waw.display.style.backgroundColor = backgroundColor;
+} //全体関数終了
 
 const options = {
   color: "limegreen",

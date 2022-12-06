@@ -11,15 +11,16 @@ body {
 #panel {
   text-align: center;
   margin: auto;
-  width: 10em;
+  width: 9em;
 }
 
 #display {
   text-align: center;
   background-color: black;
+  font-size: 20px;
   color: aqua;
   margin-bottom: 0.2em;
-  padding: 0.5em;
+  padding: 0.2em;
 }
 
 #log_list {
@@ -27,4 +28,19 @@ body {
   color: blue;
   font-size: 12px;
   line-height: 5px;
+}
+
+.anchor {
+  text-align: center;
+  background-color: moccasin;
+  margin-left: calc(50% - 5em);
+  margin-right: calc(50% - 5em);
+  margin-top: 1px;
+  margin-bottom: 1px;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+}
+
+p {
+  text-align: center;
 }
