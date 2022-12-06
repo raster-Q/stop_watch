@@ -253,6 +253,8 @@ function stopwatch(options) {
     "change",
     function () {
       audy.volume = elem_volume.value;
+      audy2[0].volume = elem_volume.value;
+      audy2[1].volume = elem_volume.value;
       elem_range.textContent = elem_volume.value;
     },
     false
