@@ -8,14 +8,21 @@ function stopwatch(options) {
     /*  wa(tch) + w  */
     time: 10000000, //全体タイム
     sto: 1, //0ウォッチ稼働、1ウォッチ停止
-    timeElem: [], //0時間、1分、2秒
-    timeElem2: ""
+    timeElem: [], //[時間,分,秒]
+    timeElem2: "",
+    reload: () => {
+      waw.timeElem[0] = Math.floor(waw.time / 10000) % 100;
+      waw.timeElem[1] = Math.floor(waw.time / 100) % 100;
+      waw.timeElem[2] = waw.time % 100;
+      return waw.timeElem;
+    },
+    display: document.getElementById("display"),
+    displayLoad: () => {
+      waw.display = document.getElementById("display");
+      waw.timeElem2 = get_time(waw.reload());
+      waw.display.textContent = `${waw.timeElem2}`;
+    }
   };
-  waw.timeElem[0] = Math.floor(waw.time / 10000) % 100;
-  waw.timeElem[1] = Math.floor(waw.time / 100) % 100;
-  waw.timeElem[2] = waw.time % 100;
-
-  const display = document.getElementById("display");
 
   //---効果音関連
   const audy = document.getElementById("timer_mp3");
@@ -51,12 +58,7 @@ function stopwatch(options) {
         if (Math.floor(waw.time / 100) % 100 > 59) {
           waw.time += 4000; //60進法、分
         }
-
-        waw.timeElem[0] = Math.floor(waw.time / 10000) % 100;
-        waw.timeElem[1] = Math.floor(waw.time / 100) % 100;
-        waw.timeElem[2] = waw.time % 100;
-        waw.timeElem2 = get_time(waw.timeElem);
-        display.textContent = `${waw.timeElem2}`;
+        waw.displayLoad();
         audio2();
         break;
       case 1: //ウォッチ停止
@@ -75,9 +77,7 @@ function stopwatch(options) {
       "ended",
       () => {
         audy.currentTime = 0;
-        switch (
-          waw.sto //ウォッチ稼働フラグ
-        ) {
+        switch (waw.sto) {
           case 0: //ウォッチ稼働
             audy.play();
             break;
@@ -95,7 +95,6 @@ function stopwatch(options) {
   function audio2() {
     if (waw.time % 100 >= 50 && waw.time % 10 >= 7) {
       audy2[0].play();
-      audy2.currentTime = 0;
       setTimeout(() => {
         audy2[0].pause();
         audy2[0].currentTime = 0;
@@ -104,7 +103,6 @@ function stopwatch(options) {
 
     if (waw.time % 100 === 0 && waw.time % 10 === 0) {
       audy2[1].play();
-      audy2.currentTime = 0;
     }
   }
   //---オーディオ用ここまで
@@ -122,13 +120,12 @@ function stopwatch(options) {
   //////////////初期html操作/////////////////////////
   start.disabled = false;
   stop.disabled = true;
-  waw.timeElem2 = get_time(waw.timeElem);
-  display.textContent = `${waw.timeElem2}`;
+  waw.displayLoad();
   audy.volume = elem_volume.value;
   //////////////初期html操作ここまで/////////////////////////
 
-  /////クラス
-  //---ログ用class導入
+  //////////////クラス導入/////////////////////////////////////
+
   class lol {
     //////コンストラクタ//////////////
     constructor(num, now, timeElem) {
@@ -138,7 +135,28 @@ function stopwatch(options) {
     }
     //////コンストラクタ、ここまで///////
 
-    //////ログ打ち出し用関数/////////////
+    //////ログ選択用その1//////////////
+    messageLog(sto, clas, num) {
+      switch (sto) {
+        case 0:
+          this.create_p = document.createElement("p");
+          this.create_p.classList = clas;
+          this.create_p.innerText = this.results[num];
+          this.anchor_div.append(this.create_p);
+          console.log(this.create_p);
+          break;
+        case 1:
+          this.create_p = document.querySelector(clas);
+          this.create_p.textContent = `${this.results[num]}`;
+          console.log(this.create_p);
+          break;
+        default:
+          break;
+      }
+    }
+    //////ログ選択用その1、ここまで///////////////
+
+    //////ログ選択用その2///////////////////////
     result(sto) {
       this.timeElem[0] = this.now.getHours();
       this.timeElem[1] = this.now.getMinutes();
@@ -147,68 +165,48 @@ function stopwatch(options) {
       this.results = [
         `${this.num} 開始  ${this.timeElem2}`,
         `　終了 ${this.timeElem2}`,
-        `　経過 ${waw.timeElem2}`
+        `　経過 ${waw.timeElem2}`,
+        `-----------------`
       ];
-      this.create_p = document.createElement("p");
-      this.create_p.classList = "log";
-      this.create_p.innerText = this.results[sto];
       switch (waw.sto) {
         case 0:
           this.anchor_div = document.createElement("div");
           this.anchor_div.classList = "anchor";
           this.log_list_section = document.querySelector("#log_list");
           this.log_list_section.prepend(this.anchor_div);
-          this.anchor_div = document.querySelector(".anchor");
-          this.anchor_div.append(this.create_p);
 
-          this.create_p = document.createElement("p");
-          this.create_p.classList = "stop";
-          this.create_p.innerText = "-----------------";
-          this.anchor_div = document.querySelector(".anchor");
-          this.anchor_div.append(this.create_p);
-
-          this.create_p = document.createElement("p");
-          this.create_p.classList = "process";
-          this.create_p.innerText = "-----------------";
-          this.anchor_div = document.querySelector(".anchor");
-          this.anchor_div.append(this.create_p);
-
+          this.messageLog(waw.sto, `start`, 0);
+          this.messageLog(waw.sto, `stop`, 3);
+          this.messageLog(waw.sto, `process`, 3);
           break;
         case 1:
-          this.anchor_div = document.querySelector(".anchor");
-          this.create_p = document.querySelector(".stop");
-          this.create_p.textContent = `${this.results[1]}`;
-
-          this.anchor_div = document.querySelector(".anchor");
-          this.change_p = document.querySelector(".process");
-          this.change_p.textContent = `${this.results[2]}`;
-          this.anchor_div = document.querySelector(".anchor");
-          //         this.anchor_div.replace('anchor','fixing');
+          this.messageLog(waw.sto, `.stop`, 1);
+          this.messageLog(waw.sto, `.process`, 2);
           break;
         default:
           break;
       }
     }
-    //////ログ打ち出し用関数、ここまで///////
+    //////ログ選択用その2、ここまで///////
 
+    //////ログ打ち出し用関数/////////////
     disp_log() {
-      switch (
-        waw.sto //ウォッチ稼働フラグ
-      ) {
+      switch (waw.sto) {
         case 0: //ウォッチ稼働
-          this.result(waw.sto);
+          this.result(0);
           break;
         case 1: //ウォッチ停止
-          this.result(waw.sto);
-          this.result(waw.sto + 1);
+          this.result(1);
+          this.result(2);
           break;
         default:
           break;
       }
     }
   }
-  //------ログ用class導入、ここまで
-  /////クラス、ここまで
+  //////ログ打ち出し用関数、ここまで
+
+  /////////////////クラス導入、ここまで///////////////
 
   //-----イベント処理、スタートボタン
   start.addEventListener(
@@ -218,18 +216,17 @@ function stopwatch(options) {
       stop.disabled = false;
       waw.time = 10000000;
       waw.sto = 0;
-      waw.timeElem2 = get_time(waw.timeElem);
-      display.textContent = `${waw.timeElem2}`;
+      waw.displayLoad();
       num++;
       if (watcherId == null) {
         watcherId = setInterval(disp_watchw, 1000);
       }
 
       audio();
-      ///class導入///
+      ///ログ打ち出し、class導入///
       let logger = new lol(num, new Date(), []);
       logger.disp_log();
-      ///class導入、ここまで///
+      ///ログ打ち出し、class導入、ここまで///
     },
     false
   );
@@ -243,10 +240,10 @@ function stopwatch(options) {
       waw.sto = 1; //ストップウォッチ停止状態
       clearInterval(watcherId);
       watcherId = null;
-      ///class導入///
+      ///ログ打ち出し、class導入///
       let logger = new lol(num, new Date(), []);
       logger.disp_log();
-      ///class導入、ここまで///
+      ///ログ打ち出し、class導入、ここまで///
     },
     false
   );
@@ -265,8 +262,8 @@ function stopwatch(options) {
   options = options || {};
   let color = options.color || "lightblue";
   let backgroundColor = options.backgroundColor || "black";
-  display.style.color = color;
-  display.style.backgroundColor = backgroundColor;
+  waw.display.style.color = color;
+  waw.display.style.backgroundColor = backgroundColor;
 } //全体関数終了
 
 const options = {
