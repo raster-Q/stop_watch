@@ -24,6 +24,14 @@ function stopwatch(options) {
     }
   };
 
+    //---ログ用
+  const lol = {
+    /*  lo(g) + l  */
+    num:0,
+    now:new Date(),
+    logger: null
+  }
+
   //---効果音関連
   const audy = document.getElementById("timer_mp3");
   const audy2 = [
@@ -39,8 +47,6 @@ function stopwatch(options) {
   const elem_volume = document.getElementById("volume");
   const elem_range = document.getElementById("vol_range");
 
-  //---ログ用
-  let num = 0;
   /////変数ここまで
 
   /////関数
@@ -126,11 +132,10 @@ function stopwatch(options) {
 
   //////////////クラス導入/////////////////////////////////////
 
-  class lol {
+  class CreateLog {
     //////コンストラクタ//////////////
-    constructor(num, now, timeElem) {
+    constructor(num, timeElem) {
       this.num = num;
-      this.now = now;
       this.timeElem = timeElem;
     }
     //////コンストラクタ、ここまで///////
@@ -158,9 +163,9 @@ function stopwatch(options) {
 
     //////ログ選択用その2///////////////////////
     result(sto) {
-      this.timeElem[0] = this.now.getHours();
-      this.timeElem[1] = this.now.getMinutes();
-      this.timeElem[2] = this.now.getSeconds();
+      this.timeElem[0] = lol.now.getHours();
+      this.timeElem[1] = lol.now.getMinutes();
+      this.timeElem[2] = lol.now.getSeconds();
       this.timeElem2 = get_time(this.timeElem);
       this.results = [
         `${this.num} 開始  ${this.timeElem2}`,
@@ -217,15 +222,16 @@ function stopwatch(options) {
       waw.time = 10000000;
       waw.sto = 0;
       waw.displayLoad();
-      num++;
+      lol.now = new Date();
+      lol.num++;
       if (watcherId == null) {
         watcherId = setInterval(disp_watchw, 1000);
       }
 
       audio();
       ///ログ打ち出し、class導入///
-      let logger = new lol(num, new Date(), []);
-      logger.disp_log();
+      lol.logger = new CreateLog(lol.num,[]);
+      lol.logger.disp_log();
       ///ログ打ち出し、class導入、ここまで///
     },
     false
@@ -238,11 +244,11 @@ function stopwatch(options) {
       stop.disabled = true;
       start.disabled = false;
       waw.sto = 1; //ストップウォッチ停止状態
+      lol.now = new Date();
       clearInterval(watcherId);
       watcherId = null;
       ///ログ打ち出し、class導入///
-      let logger = new lol(num, new Date(), []);
-      logger.disp_log();
+      lol.logger.disp_log();
       ///ログ打ち出し、class導入、ここまで///
     },
     false
