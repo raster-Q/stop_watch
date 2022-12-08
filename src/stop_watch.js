@@ -1,6 +1,5 @@
 function stopwatch(options) {
   //全体関数発動
-
   /////変数
   //---ウォッチ関連
   let watcherId = null;
@@ -10,6 +9,7 @@ function stopwatch(options) {
     sto: 1, //0ウォッチ稼働、1ウォッチ停止
     timeElem: [], //[時間,分,秒]
     timeElem2: "",
+    elemer: null,
     reload: () => {
       waw.timeElem[0] = Math.floor(waw.time / 10000) % 100;
       waw.timeElem[1] = Math.floor(waw.time / 100) % 100;
@@ -19,18 +19,29 @@ function stopwatch(options) {
     display: document.getElementById("display"),
     displayLoad: () => {
       waw.display = document.getElementById("display");
-      waw.timeElem2 = get_time(waw.reload());
+      waw.elemer = new TimeJoin(waw.reload());
+      waw.timeElem2 = waw.elemer.get_time();
       waw.display.textContent = `${waw.timeElem2}`;
     }
   };
 
-    //---ログ用
+  //---ログ用
   const lol = {
     /*  lo(g) + l  */
-    num:0,
-    now:new Date(),
-    logger: null
-  }
+    num: 0,
+    now: new Date(),
+    timeElem: [],
+    timeElem2: "",
+    elemer: null,
+    logger: null,
+    reload: () => {
+      lol.now = new Date();
+      lol.timeElem[0] = lol.now.getHours();
+      lol.timeElem[1] = lol.now.getMinutes();
+      lol.timeElem[2] = lol.now.getSeconds();
+      return lol.timeElem;
+    }
+  };
 
   //---効果音関連
   const audy = document.getElementById("timer_mp3");
@@ -61,9 +72,10 @@ function stopwatch(options) {
           waw.time += 40; //60進法、秒
         }
 
-        if (Math.floor(waw.time / 100) % 100 > 59) {
+        if (waw.time % 10000 > 5999) {
           waw.time += 4000; //60進法、分
         }
+
         waw.displayLoad();
         audio2();
         break;
@@ -113,25 +125,37 @@ function stopwatch(options) {
   }
   //---オーディオ用ここまで
 
-  //---1桁→0入り2桁
-  function get_time(timeArr) {
-    timeArr = timeArr
-      .map((e) => String(e))
-      .map((e) => (e.length < 2 ? "0" + e : e));
-    return timeArr.join(":");
-  }
-  //---1桁→0入り2桁関数、ここまで
   /////関数、ここまで
 
-  //////////////初期html操作/////////////////////////
-  start.disabled = false;
-  stop.disabled = true;
-  waw.displayLoad();
-  audy.volume = elem_volume.value;
-  //////////////初期html操作ここまで/////////////////////////
-
   //////////////クラス導入/////////////////////////////////////
+  //------タイム表示用クラス生成
+  class TimeJoin {
+    //////コンストラクタ//////////////////
+    constructor(timeElem) {
+      this.timeElem = timeElem;
+    }
+    //////コンストラクタ、ここまで//////////
+    //////表示タイム作成//////////////////
+    hex() {
+      console.log(`he =  ${this.timeElem}`);
+      this.timeElem = this.timeElem * 100;
+      lol.he++;
+      console.log(`100x ${this.timeElem}`);
+    }
+    //////表示タイム作成、ここまで//////////
 
+    //---1桁→0入り2桁
+    get_time() {
+      this.timeElem = this.timeElem
+        .map((e) => String(e))
+        .map((e) => (e.length < 2 ? "0" + e : e));
+      return this.timeElem.join(":");
+    }
+    //---1桁→0入り2桁関数、ここまで
+  }
+  //------タイム表示用クラス、ここまで
+
+  //------ログ用クラス生成
   class CreateLog {
     //////コンストラクタ//////////////
     constructor(num, timeElem) {
@@ -163,10 +187,14 @@ function stopwatch(options) {
 
     //////ログ選択用その2///////////////////////
     result(sto) {
+      /*
       this.timeElem[0] = lol.now.getHours();
       this.timeElem[1] = lol.now.getMinutes();
       this.timeElem[2] = lol.now.getSeconds();
-      this.timeElem2 = get_time(this.timeElem);
+      */
+      lol.reload();
+      lol.elemer = new TimeJoin(lol.timeElem);
+      this.timeElem2 = lol.elemer.get_time();
       this.results = [
         `${this.num} 開始  ${this.timeElem2}`,
         `　終了 ${this.timeElem2}`,
@@ -210,8 +238,16 @@ function stopwatch(options) {
     }
   }
   //////ログ打ち出し用関数、ここまで
+  //------ログ用クラス生成、ここまで
 
   /////////////////クラス導入、ここまで///////////////
+
+  //////////////初期html操作/////////////////////////
+  start.disabled = false;
+  stop.disabled = true;
+  waw.displayLoad();
+  audy.volume = elem_volume.value;
+  //////////////初期html操作ここまで/////////////////////////
 
   //-----イベント処理、スタートボタン
   start.addEventListener(
@@ -230,7 +266,7 @@ function stopwatch(options) {
 
       audio();
       ///ログ打ち出し、class導入///
-      lol.logger = new CreateLog(lol.num,[]);
+      lol.logger = new CreateLog(lol.num, []);
       lol.logger.disp_log();
       ///ログ打ち出し、class導入、ここまで///
     },
