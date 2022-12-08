@@ -226,6 +226,11 @@ function stopwatch(options) {
   stop.disabled = true;
   waw.displayLoad();
   audy.volume = elem_volume.value;
+  elem_volume.value = "0";
+  audy.volume = elem_volume.value;
+  audy2[0].volume = elem_volume.value;
+  audy2[1].volume = elem_volume.value;
+  elem_range.textContent = elem_volume.value;
   //////////////初期html操作ここまで///////////////////
 
   //-----イベント処理、スタートボタン
@@ -280,6 +285,7 @@ function stopwatch(options) {
     },
     false
   );
+
   //----ここまで
 
   options = options || {};
